@@ -1,0 +1,30 @@
+# Ignore any build directories
+build/
+bin/
+out/
+
+# CMake artifacts
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+CMakeUserPresets.json
+
+# Editor and IDE files
+.vs/
+*.user
+*.suo
+*.sln
+.vscode/
+.idea/
+cmake-build-*/
+*.xcodeproj./
+*.xcworkspace/
+
