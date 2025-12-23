@@ -8,7 +8,7 @@ template <ValidContext Context, int Rows, int Cols>
 class Tensor {
  public:
   explicit Tensor(Context& ctx)
-      : ctx_(ctx), data_(Rows * Cols, ctx_.device_type) {}
+      : ctx_(ctx), data_(Rows * Cols, ctx.device_type) {}
 
  private:
   Storage<float> data_;
