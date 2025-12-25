@@ -28,3 +28,26 @@ target_sources(NeuralNetworkLibrary
       include/foo.h
 )
 ]]
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/52eb8108c5bdec04579160ae17225d66034bd723.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(network_test)
+target_sources(network_test
+  PRIVATE
+    test/network_test.cpp
+)
+target_link_libraries(
+  network_test
+  GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(network_test)

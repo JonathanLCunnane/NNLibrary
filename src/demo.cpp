@@ -14,11 +14,14 @@ int main() {
   IdentityActivation<CPUContext, 3> act2(ctx);
   IdentityLayer<CPUContext, 4, 3> layer2(ctx, act2);
 
-  CrossEntropyLossLayer<CPUContext, 4> loss_layer(ctx);
+  CrossEntropyLossLayer<CPUContext, 3> loss_layer(ctx);
 
   Network<CPUContext, 5, 3, CrossEntropyLossLayer<CPUContext, 3>,
           IdentityLayer<CPUContext, 5, 4>, IdentityLayer<CPUContext, 4, 3> >
-      network;
+      network(ctx, loss_layer, layer1, layer2);
+
+  network.forward(*(new Tensor<CPUContext, 1, 5>(ctx)));
+  network.backward(*(new Tensor<CPUContext, 1, 3>(ctx)));
 
   printf("Hello, World!\n");
   return 0;

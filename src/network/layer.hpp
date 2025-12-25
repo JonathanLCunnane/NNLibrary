@@ -14,18 +14,25 @@ class Layer {
   using kContext = Context;
 
   Layer(Context& ctx, Activation& act)
-      : ctx_(ctx), act_(act), weights_(ctx), biases_(ctx) {
+      : ctx_(ctx),
+        act_(act),
+        weights_(ctx),
+        biases_(ctx),
+        linear_output_(ctx),
+        grad_z(ctx),
+        cached_input_(nullptr) {
     // Initialize weights and biases here.
   }
 
   void forward(Tensor<Context, 1, In>& input, Tensor<Context, 1, Out>& output) {
     // Implement forward pass logic here
-    act_.forward(input, output);
+    cached_input_ = &input;
+    act_.forward(linear_output_, output);
   }
 
   void backward(Tensor<Context, 1, Out>& grad_a_in,
-                Tensor<Context, 1, In>& grad_z_out) {
-    act_.backward(grad_a_in, grad_z_out);
+                Tensor<Context, 1, In>& grad_x_out) {
+    act_.backward(grad_a_in, grad_z);
     // Implement backward pass logic here
   }
 
@@ -34,7 +41,9 @@ class Layer {
   Activation act_;
   Tensor<Context, In, Out> weights_;
   Tensor<Context, 1, Out> biases_;
-  Tensor<Context, 1, Out>* cached_output_;
+  Tensor<Context, 1, Out> linear_output_;
+  Tensor<Context, 1, Out> grad_z;
+  Tensor<Context, 1, In>* cached_input_;
 };
 
 template <typename T, typename Context>
@@ -43,8 +52,11 @@ concept ValidLayer = requires {
   { T::kIn } -> std::convertible_to<int>;
   { T::kOut } -> std::convertible_to<int>;
 
+  requires T::kIn > 0;
+  requires T::kOut > 0;
+
   // Ensures all layers in a network share the same context type.
-  std::same_as<typename T::kContext, Context>;
+  std::same_as<typename T::kContext, Context>;  // TODO: Make more strict.
 };
 
 template <ValidContext Context, int In, int Out>
@@ -58,11 +70,12 @@ class LossLayer {
   virtual float loss(Tensor<Context, 1, In>& predictions,
                      Tensor<Context, 1, In>& targets) = 0;
 
-  virtual void grad(Tensor<Context, 1, In>& grad_yhat_out) = 0;
+  virtual void grad(Tensor<Context, 1, In>& predictions,
+                    Tensor<Context, 1, In>& targets,
+                    Tensor<Context, 1, In>& grad_out) = 0;
 
  protected:
   Context& ctx_;
-  Tensor<Context, 1, In>* cached_predictions_;
 };
 
 // Specific layer type for Cross Entropy Loss with Softmax activation
@@ -77,7 +90,9 @@ class CrossEntropyLossLayer : public LossLayer<Context, In> {
     return 0.0f;
   }
 
-  void grad(Tensor<Context, 1, In>& grad_yhat_out) override {
+  void grad(Tensor<Context, 1, In>& predictions,
+            Tensor<Context, 1, In>& targets,
+            Tensor<Context, 1, In>& grad_out) override {
     // Implement gradient calculation here
   }
 };
