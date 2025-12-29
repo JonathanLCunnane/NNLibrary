@@ -29,12 +29,13 @@ class IdentityActivation : public Activation<Context, Out> {
 
   void forward(Tensor<Context, 1, Out>& input,
                Tensor<Context, 1, Out>& output) override {
-    // Identity forward pass: output = input
+    output = input;
+    this->cached_input_ = &input;
   }
 
   void backward(Tensor<Context, 1, Out>& grad_a_in,
                 Tensor<Context, 1, Out>& grad_z_out) override {
-    // Identity backward pass: grad_z_out = grad_a_in
+    grad_z_out = grad_a_in;
   }
 };
 

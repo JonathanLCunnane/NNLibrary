@@ -7,12 +7,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(demo)
-target_sources(demo
-  PRIVATE
-    src/demo.cpp
-)
-
 #[[
 add_library(NeuralNetworkLibrary)
 target_sources(NeuralNetworkLibrary
@@ -30,6 +24,16 @@ target_sources(NeuralNetworkLibrary
 ]]
 
 include(FetchContent)
+
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+set(BUILD_TESTING OFF CACHE BOOL "Disable building tests for Fastor" FORCE)
+FetchContent_Declare(
+  fastor
+  URL https://github.com/romeric/Fastor/archive/refs/tags/V0.6.4.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(fastor)
+
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/52eb8108c5bdec04579160ae17225d66034bd723.zip
@@ -39,15 +43,29 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(network_test)
-target_sources(network_test
+add_executable(tests)
+target_sources(tests
   PRIVATE
     test/network_test.cpp
+    test/activation_test.cpp
+    test/layer_test.cpp
 )
 target_link_libraries(
-  network_test
+  tests
   GTest::gtest_main
+  GTest::gmock
+  Fastor
 )
 
 include(GoogleTest)
-gtest_discover_tests(network_test)
+gtest_discover_tests(tests)
+
+add_executable(demo)
+target_sources(demo
+  PRIVATE
+    src/demo.cpp
+)
+target_link_libraries(demo
+  PRIVATE
+    Fastor
+)

@@ -5,16 +5,15 @@
 
 #include "devices.hpp"
 
-struct Context {
-  DeviceType device_type;
-  Context(DeviceType device_type) : device_type(device_type) {}
+template <DeviceType Device>
+class Context {
+ public:
+  static constexpr DeviceType kDevice = Device;
 };
 
-struct CPUContext : public Context {
-  CPUContext() : Context(DeviceType::CPU) {}
-};
+struct CPUContext : public Context<DeviceType::CPU> {};
 
 template <typename T>
-concept ValidContext = std::derived_from<T, Context>;
+concept ValidContext = std::same_as<T, CPUContext>;
 
 #endif  // CONTEXTS_HPP
