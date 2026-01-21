@@ -138,6 +138,9 @@ concept ValidLayer = requires {
 template <ValidContext Context, int In, int Out>
 using IdentityLayer = Layer<Context, In, Out, IdentityActivation<Context, Out>>;
 
+template <ValidContext Context, int In, int Out>
+using ReLULayer = Layer<Context, In, Out, ReLUActivation<Context, Out>>;
+
 template <ValidContext Context, int In>
 class LossLayer {
  public:
